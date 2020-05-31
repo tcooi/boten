@@ -20,9 +20,9 @@ module.exports = {
         return embed;
     }
 
-    const createDayEmbed = (weekday, morningTemperature, dayTemperature, eveningTemperature, nightTemperature, description, state, city) => {
+    const createDayEmbed = (currentWeekday, morningTemperature, dayTemperature, eveningTemperature, nightTemperature, description, state, city) => {
       const embed = new Discord.MessageEmbed()
-        .setTitle(`${weekday}`)
+        .setTitle(`${currentWeekday}`)
         .addFields(
           { name: 'Morning:', value: `${morningTemperature}`, inline: true },
           { name: 'Afternoon:', value: `${dayTemperature}`, inline: true },
@@ -33,26 +33,22 @@ module.exports = {
       return embed;
     }
 
-    const createWeekEmbed = (locationName) => {
-      const embed = new Discord.MessageEmbed()
-        .setTitle('test')
-        .addFields(
-          { name: 'feels like', value: 'test', inline: true },
-          { name: 'low high', value: 'test', inline: true },
-          { name: 'description', value: 'test', inline: true }
-        )
-        .setFooter(`${locationName}`);
-      return embed;
-    }
-
+    //check for input
     if (args.length === 0) {
-      message.reply('please input city');
+      message.reply('please enter city');
       return;
     }
 
-    let cityInput = args[0];
+    let weekdays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+    let options = ['today', 't', 'tomorrow', 'tm']
 
-    if (args.length === 1) {
+    //weather now
+    if (!options.includes(args[args.length - 1].toLowerCase()) && !weekdays.includes(args[args.length - 1].toLowerCase())) {
+      let cityInput = '';
+      args.forEach(word => {
+        cityInput += word + ' ';
+      })
+      
       try {
         let weatherData = await fetch(`https://weather.ls.hereapi.com/weather/1.0/report.json?apiKey=${api.here}&product=observation&name=${cityInput}`);
         let weatherJson = await weatherData.json();
@@ -67,67 +63,54 @@ module.exports = {
       } catch (error) {
         console.error(error);
       }
-    } else if (args.includes('"')) {
-      console.log("long name");
-      console.log(args);
-  
-    } else if (args.length === 2 && (args.includes('today') || args.includes('t'))) {
-      let currentWeekday = moment().format('dddd');
-      let weatherData = await fetch(`https://weather.ls.hereapi.com/weather/1.0/report.json?apiKey=${api.here}&product=forecast_7days&name=${cityInput}`);
-      let weatherJson = await weatherData.json();
-      let city = weatherJson.forecasts.forecastLocation.city;
-      let country = weatherJson.forecasts.forecastLocation.country;
-      let week = weatherJson.forecasts.forecastLocation.forecast;
-      let day = week.filter((day) => day.weekday === currentWeekday);
+    //weather today
+    } else if (args.length > 1) {
+      let cityInput = '';
+      let city = args.splice(0, args.length - 1)
+      city.forEach(word => {
+        cityInput += word + ' ';
+      })
 
-      day.forEach( x => {
-        x.temperature = parseFloat(x.temperature).toFixed(1)
-      });
+      let currentWeekday = args[args.length - 1].charAt(0).toUpperCase() + args[args.length -1].slice(1);
 
-      do {
-        day.unshift(null)
-      } while (day.length < 4);
-
-      let morningTemperature = day[0] ? `${day[0].temperature} °C` : 'no data';
-      let dayTemperature = day[1] ? `${day[1].temperature} °C` : 'no data';
-      let eveningTemperature = day[2] ? `${day[2].temperature} °C` : 'no data';
-      let nightTemperature = day[3] ? `${day[3].temperature} °C` : 'no data';
-      let description = day[1] ? day[1].description : 'no data';
-
-      console.log('command weather today');
-      message.channel.send(createDayEmbed(currentWeekday, morningTemperature, dayTemperature, eveningTemperature, nightTemperature, description, city, country));
-    } else if (args.length === 2 && (args.includes('tomorrow') || args.includes('tm'))) {
-      let currentWeekday = moment().add(1, 'days').format('dddd');
-      let weatherData = await fetch(`https://weather.ls.hereapi.com/weather/1.0/report.json?apiKey=${api.here}&product=forecast_7days&name=${cityInput}`);
-      let weatherJson = await weatherData.json();
-      let city = weatherJson.forecasts.forecastLocation.city;
-      let country = weatherJson.forecasts.forecastLocation.country;
-      let week = weatherJson.forecasts.forecastLocation.forecast;
-      let day = week.filter((day) => day.weekday === currentWeekday);
-
-      day.forEach( x => {
-        x.temperature = parseFloat(x.temperature).toFixed(1)
-        console.log(x.temperature)
-      });
-
-      if (day.length != 4) {
-        do {
-          day.unshift(null)
-        } while (day.length < 4);
+      let day = args.pop();
+      if (day.toLowerCase() === 'today' || day.toLowerCase() === 't') {
+        currentWeekday = moment().format('dddd');
+      } else if (day.toLowerCase() === 'tomorrow' || day.toLowerCase() === 'tm') {
+        currentWeekday = moment().add(1, 'days').format('dddd');
       }
 
-      let morningTemperature = day[0] ? `${day[0].temperature} °C` : 'no data';
-      let dayTemperature = day[1] ? `${day[1].temperature} °C` : 'no data';
-      let eveningTemperature = day[2] ? `${day[2].temperature} °C` : 'no data';
-      let nightTemperature = day[3] ? `${day[3].temperature} °C` : 'no data';
-      let description = day[1] ? day[1].description : 'no data';
+      try {
+        let weatherData = await fetch(`https://weather.ls.hereapi.com/weather/1.0/report.json?apiKey=${api.here}&product=forecast_7days&name=${cityInput}`);
+        let weatherJson = await weatherData.json();
+        let city = weatherJson.forecasts.forecastLocation.city;
+        let country = weatherJson.forecasts.forecastLocation.country;
+        let week = weatherJson.forecasts.forecastLocation.forecast;
+        let day = week.filter((day) => day.weekday === currentWeekday);
 
-      console.log('command weather tomorrow');
-      message.channel.send(createDayEmbed(currentWeekday, morningTemperature, dayTemperature, eveningTemperature, nightTemperature, description, city, country));
-    } else if (args.length === 2 && (args.includes(moment().format('dddd')))) {
-      console.log('week');
+        day.forEach( x => {
+          x.temperature = parseFloat(x.temperature).toFixed(1);
+        });
+
+        if (day.length != 4) {
+          do {
+            day.unshift(null)
+          } while (day.length < 4);
+        }
+
+        let morningTemperature = day[0] ? `${day[0].temperature} °C` : 'no data';
+        let dayTemperature = day[1] ? `${day[1].temperature} °C` : 'no data';
+        let eveningTemperature = day[2] ? `${day[2].temperature} °C` : 'no data';
+        let nightTemperature = day[3] ? `${day[3].temperature} °C` : 'no data';
+        let description = day[1] ? day[1].description : 'no data';
+
+        console.log('command weather dayview');
+        message.channel.send(createDayEmbed(currentWeekday, morningTemperature, dayTemperature, eveningTemperature, nightTemperature, description, city, country));
+      } catch (error) {
+        console.log(error);
+      }
     } else {
-      console.log(moment().format('dddd'));
+      console.log('non');
     }
   }
 }
