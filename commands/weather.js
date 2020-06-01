@@ -92,6 +92,7 @@ module.exports = {
           x.temperature = parseFloat(x.temperature).toFixed(1);
         });
 
+        //bug last day display wrong temp
         if (day.length != 4) {
           do {
             day.unshift(null)
