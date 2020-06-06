@@ -63,7 +63,7 @@ module.exports = {
       } catch (error) {
         console.error(error);
       }
-    //weather today
+    //weather day
     } else if (args.length > 1) {
       let cityInput = '';
       let city = args.splice(0, args.length - 1)
@@ -92,8 +92,8 @@ module.exports = {
           x.temperature = parseFloat(x.temperature).toFixed(1);
         });
 
-        //bug last day display wrong temp
-        if (day.length != 4) {
+        //fill empty space with null
+        if (day.length != 4 && currentWeekday === moment().format('dddd')) {
           do {
             day.unshift(null)
           } while (day.length < 4);
