@@ -1,7 +1,9 @@
-const { api } = require('../config.json');
+require('dotenv').config();
 const fetch = require('node-fetch');
 const moment = require('moment');
 const Discord = require('discord.js');
+
+const api_here = process.env.API_HERE;
 
 module.exports = {
   name: 'weather',
@@ -50,7 +52,7 @@ module.exports = {
       })
       
       try {
-        let weatherData = await fetch(`https://weather.ls.hereapi.com/weather/1.0/report.json?apiKey=${api.here}&product=observation&name=${cityInput}`);
+        let weatherData = await fetch(`https://weather.ls.hereapi.com/weather/1.0/report.json?apiKey=${api_here}&product=observation&name=${cityInput}`);
         let weatherJson = await weatherData.json();
         let temperature = parseFloat(weatherJson.observations.location[0].observation[0].temperature).toFixed(1);
         let comfort = parseFloat(weatherJson.observations.location[0].observation[0].comfort).toFixed(1);
@@ -81,7 +83,7 @@ module.exports = {
       }
 
       try {
-        let weatherData = await fetch(`https://weather.ls.hereapi.com/weather/1.0/report.json?apiKey=${api.here}&product=forecast_7days&name=${cityInput}`);
+        let weatherData = await fetch(`https://weather.ls.hereapi.com/weather/1.0/report.json?apiKey=${api_here}&product=forecast_7days&name=${cityInput}`);
         let weatherJson = await weatherData.json();
         let city = weatherJson.forecasts.forecastLocation.city;
         let country = weatherJson.forecasts.forecastLocation.country;

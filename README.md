@@ -1,33 +1,31 @@
-# boten
+# Boten
 
-create new discord application and get token
+## Usage
+
+Create new Discord application and get token
 https://discordapp.com/developers/applications
 
-save token in config.json
+Get a Here location services REST API key
+https://developer.here.com/projects
 
-here api key
-
-## usage
-
-fix dependencies
+Fix dependencies
 ```
 npm install
 ```
 
-create config.json in root folder
+Rename ".env_sample" to ".env"
 ```
-{
-  "token": "DISCORD_TOKEN"
-}
+DISCORD_TOKEN=YOUR_DISCORD_TOKEN_HERE
+API_HERE=YOUR_API_KEY_HERE
 ```
 
-start bot
+Start bot
 ```
 npm start
 ```
 
-## commands
+## Commands
 
 ```
-todo
+/weather
 ```

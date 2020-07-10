@@ -1,9 +1,12 @@
-const { token, prefix } = require('./config.json');
+require('dotenv').config();
+const { prefix } = require('./config.json');
 const fs = require('fs');
 const Discord = require('discord.js');
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
+
+const token = process.env.DISCORD_TOKEN;
 
 console.log(`Loading ${commandFiles.length} commands`);
 
