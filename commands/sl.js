@@ -2,9 +2,9 @@ const { api } = require('../config.json');
 const fetch = require('node-fetch');
 
 module.exports = {
-  name: 'transit',
-  aliases: ['t'],
-  description: 'transit',
+  name: 'sl',
+  aliases: ['sl'],
+  description: 'sl',
   async execute(message, args) {
 
     if (args.length === 0) {

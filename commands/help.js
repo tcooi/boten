@@ -10,7 +10,7 @@ module.exports = {
       .setTitle("available commands")
       .setDescription("description")
       .addField("/help", "todo")
-      .addField("/transit", "todo")
+      .addField("/sl", "todo")
       .addField("/weather", "todo")
     message.channel.send(embed);
   }
