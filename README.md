@@ -13,7 +13,7 @@ Fix dependencies
 npm install
 ```
 
-Rename ".env_sample" to ".env"
+Setup .env file
 ```
 DISCORD_TOKEN=YOUR_DISCORD_TOKEN_HERE
 API_HERE=YOUR_API_KEY_HERE
