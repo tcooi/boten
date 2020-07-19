@@ -26,6 +26,11 @@ npm start
 
 ## Commands
 
-```
-/weather
-```
+-help
+-pollen
+-weather
+
+## TODO
+-command for SATS, show opening hours and show predicted graph 
+-add option to set default value for input
+-command for SL, search departure and trip
