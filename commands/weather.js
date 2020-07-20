@@ -64,6 +64,7 @@ module.exports = {
         message.channel.send(createNowEmbed(temperature, comfort, description, city, country));
       } catch (error) {
         console.error(error);
+        message.channel.send(error.message);
       }
     //weather day
     } else if (args.length > 1) {
@@ -110,7 +111,8 @@ module.exports = {
         console.log('command weather dayview');
         message.channel.send(createDayEmbed(currentWeekday, morningTemperature, dayTemperature, eveningTemperature, nightTemperature, description, city, country));
       } catch (error) {
-        console.log(error);
+        console.error(error);
+        message.channel.send(error.message);
       }
     } else {
       console.log('non');
