@@ -12,7 +12,7 @@ module.exports = {
   async execute(message, args) {
     const createNowEmbed = (temperature, comfort, description, city, country) => {
       const embed = new Discord.MessageEmbed()
-        .setTitle('Now')
+        .setTitle('Weather - Now')
         .addFields(
           { name: 'Temperature:', value: `${temperature} °C`, inline: true},
           { name: 'Feels like:', value: `${comfort} °C`, inline: true},
@@ -24,7 +24,7 @@ module.exports = {
 
     const createDayEmbed = (currentWeekday, morningTemperature, dayTemperature, eveningTemperature, nightTemperature, description, state, city) => {
       const embed = new Discord.MessageEmbed()
-        .setTitle(`${currentWeekday}`)
+        .setTitle(`Weather - ${currentWeekday}`)
         .addFields(
           { name: 'Morning:', value: `${morningTemperature}`, inline: true },
           { name: 'Afternoon:', value: `${dayTemperature}`, inline: true },
