@@ -7,14 +7,46 @@ module.exports = {
   description: 'pollen',
   async execute(message, args) {
 
-    const pollenEmbed = (area, pollenData, fetchTime) => {
+    const pollenEmbed = (area, pollenForecast, pollenLevel, fetchTime) => {
       const embed = new Discord.MessageEmbed()
         .setTitle(`Pollen forecast`)
         .addFields(
-          { name: `${area}`, value: `${pollenData}`, inline: true }
+          { name: `${area}`, value: `${pollenForecast}`, inline: true },
+          { name: `Levels:`, value: `${pollenLevel}`, inline: true }
         )
         .setFooter(`Last update: ${fetchTime}`);
       return embed;
+    }
+
+    function levelsMeter(level) {
+      let meter = ''
+      switch (level) {
+        case '0':
+          meter = '⦾⦾⦾⦾⦾⦾⦾';
+          break;
+        case '1':
+          meter = '⦿⦾⦾⦾⦾⦾⦾';
+          break;
+        case '2':
+          meter = '⦿⦿⦾⦾⦾⦾⦾';
+          break;
+        case '3':
+          meter = '⦿⦿⦿⦾⦾⦾⦾';
+          break;
+        case '4':
+          meter = '⦿⦿⦿⦿⦾⦾⦾';
+          break;
+        case '5':
+          meter = '⦿⦿⦿⦿⦿⦾⦾';
+          break;
+        case '6':
+          meter = '⦿⦿⦿⦿⦿⦿⦾';
+          break;
+        case '7':
+          meter = '⦿⦿⦿⦿⦿⦿⦿';
+          break;
+      }
+      return meter;
     }
 
     if (args.length === 0) {
@@ -29,12 +61,26 @@ module.exports = {
 
     if (args.length > 0) {
       try {
-        let pollen = await fetch('http://192.168.1.29:3000/pollen/Stockholm');
+        const areaInput = args[0];
+        let pollen = await fetch(`http://192.168.1.29:3000/pollen/${areaInput}`);
         let pollenJSON = await pollen.json();
         console.log(pollenJSON);
-        message.channel.send(pollenEmbed('stockh', 'asasasa', '34234'));
-      } catch (error) {
 
+        const area = `${pollenJSON.area}:`;
+        const fetchTime = pollenJSON.fetchTime;
+
+        let pollenForecast = '';
+        let pollenLevel = '';
+
+        pollenJSON.forecast.forEach(forecastObj => {
+          pollenForecast += `${forecastObj.type}: ${forecastObj.forecast}\n`
+          pollenLevel += `${levelsMeter(forecastObj.level)}\n`;
+        });
+
+        message.channel.send(pollenEmbed(area, pollenForecast, pollenLevel, fetchTime));
+      } catch (error) {
+        console.error(error);
+        message.channel.send(error.message);
       }
     }
   }
