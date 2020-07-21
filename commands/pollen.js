@@ -59,10 +59,12 @@ module.exports = {
       return;
     }
 
+    const POLLEN_API = process.env.POLLEN_API;
+
     if (args.length > 0) {
       try {
         const areaInput = args[0];
-        let pollen = await fetch(`http://192.168.1.29:3000/pollen/${areaInput}`);
+        let pollen = await fetch(`${POLLEN_API}${areaInput}`);
         let pollenJSON = await pollen.json();
         console.log(pollenJSON);
 
@@ -72,7 +74,7 @@ module.exports = {
         let pollenForecast = '';
         let pollenLevel = '';
 
-        pollenJSON.forecast.forEach(forecastObj => {
+        pollenJSON.forecasts.forEach(forecastObj => {
           pollenForecast += `${forecastObj.type}: ${forecastObj.forecast}\n`
           pollenLevel += `${levelsMeter(forecastObj.level)}\n`;
         });
