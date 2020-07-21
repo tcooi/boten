@@ -17,6 +17,7 @@ Setup .env file
 ```
 DISCORD_TOKEN=YOUR_DISCORD_TOKEN_HERE
 API_HERE=YOUR_API_KEY_HERE
+POLLEN_URL=
 ```
 
 Start bot
@@ -27,10 +28,10 @@ npm start
 ## Commands
 
 -help\
--pollen\  
--weather\  
+-pollen\
+-weather\
 
 ## TODO
 -command for SATS, show opening hours and show predicted graph\
 -add option to set default value for input\
--command for SL, search departure and trip\ 
+-command for SL, search departure and trip\
