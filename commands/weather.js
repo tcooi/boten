@@ -24,14 +24,13 @@ module.exports = {
     }
 
     //weather day embed
-    const createDayEmbed = (currentWeekday, morningTemperature, dayTemperature, eveningTemperature, morningPrecipitation, dayPrecipitation, eveningPrecipitation, morningDescription, dayDescription, eveningDescription, state, city) => {
+    const createDayEmbed = (currentWeekday, morning, afternoon, evening, state, city) => {
       const embed = new Discord.MessageEmbed()
         .setTitle(`Weather - ${currentWeekday}`)
         .addFields(
-          { name: 'Morning:', value: `${morningTemperature}\n${morningPrecipitation}\n${morningDescription}`, inline: true },
-          { name: 'Afternoon:', value: `${dayTemperature}\n${dayPrecipitation}\n${dayDescription}`, inline: true },
-          { name: 'Evening:', value: `${eveningTemperature}\n${eveningPrecipitation}\n${eveningDescription}`, inline: true }
-          // { name: 'Description:', value: `${description}`, inline: false }
+          { name: 'Morning:', value: `${morning}`, inline: true },
+          { name: 'Afternoon:', value: `${afternoon}`, inline: true },
+          { name: 'Evening:', value: `${evening}`, inline: true }
         )
         .setFooter(`${state}, ${city}`);
       return embed;
@@ -112,15 +111,15 @@ module.exports = {
         let dayTemperature = day[1] ? `${day[1].temperature} °C` : 'no data';
         let eveningTemperature = day[2] ? `${day[2].temperature} °C` : 'no data';
 
-        let allPercipitation = (p) => {
-          if (p === null ) {
+        let allPercipitation = (percipitation) => {
+          if (percipitation === null ) {
             return 'no data';
           }
 
-          if (p.rainFall === "*" && p.snowFall != '*') {
-            return `${p.snowFall} cm`;
-          } else if (p.snowFall === '*' && p.rainFall != '*') {
-            return `${p.rainFall} cm`;
+          if (percipitation.rainFall === "*" && percipitation.snowFall != '*') {
+            return `${percipitation.snowFall} cm`;
+          } else if (percipitation.snowFall === '*' && percipitation.rainFall != '*') {
+            return `${percipitation.rainFall} cm`;
           } else {
             return '0 cm';
           }
@@ -134,8 +133,32 @@ module.exports = {
         let dayDescription = day[1] ? `${day[1].description}` : 'no data';
         let eveningDescription = day[2] ? `${day[2].description}` : 'no data';
 
+        let morning = () => {
+          if (day[0] ===  null) {
+            return 'no data';
+          } else {
+            return `${morningTemperature}\n${morningPrecipitation}\n${morningDescription}`;
+          }
+        };
+
+         let afternoon = () => {
+          if (day[1] ===  null) {
+            return 'no data';
+          } else{
+            return `${dayTemperature}\n${dayPrecipitation}\n${dayDescription}`;
+          }
+        };
+
+         let evening = () => {
+          if (day[2] ===  null) {
+            return 'no data';
+          } else {
+            return `${eveningTemperature}\n${eveningPrecipitation}\n${eveningDescription}`;
+          }
+        };
+
         console.log('command weather dayview');
-        message.channel.send(createDayEmbed(currentWeekday, morningTemperature, dayTemperature, eveningTemperature, morningPrecipitation, dayPrecipitation, eveningPrecipitation, morningDescription, dayDescription, eveningDescription, city, country));
+        message.channel.send(createDayEmbed(currentWeekday, morning(), afternoon(), evening(), city, country));
       } catch (error) {
         console.error(error);
         message.channel.send(error.message);
