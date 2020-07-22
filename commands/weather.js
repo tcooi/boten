@@ -15,12 +15,12 @@ module.exports = {
       const embed = new Discord.MessageEmbed()
         .setTitle('Weather - Now')
         .addFields(
-          { name: 'Temperature:', value: `${temperature} °C / feels like ${comfort} °C`, inline: true},
-          { name: 'Precipitation:', value: `${precipitation6H} cm over the next few hours.`, inline: true},
-          { name: 'Description:', value: `${description}`, inline: true}
+          { name: 'Temperature:', value: `${temperature} °C / feels like ${comfort} °C`, inline: true },
+          { name: 'Precipitation:', value: `${precipitation6H} cm over the next few hours.`, inline: true },
+          { name: 'Description:', value: `${description}`, inline: true }
         )
         .setFooter(`${city}, ${country}`);
-        return embed;
+      return embed;
     }
 
     //weather day embed
@@ -51,7 +51,7 @@ module.exports = {
       args.forEach(word => {
         cityInput += word + ' ';
       })
-      
+
       try {
         let weatherData = await fetch(`https://weather.ls.hereapi.com/weather/1.0/report.json?apiKey=${HERE_KEY}&product=observation&name=${cityInput}`);
         let weatherJson = await weatherData.json();
@@ -68,7 +68,7 @@ module.exports = {
         console.error(error);
         message.channel.send(error.message);
       }
-    //weather day
+      //weather day
     } else if (args.length > 1) {
       let cityInput = '';
       let city = args.splice(0, args.length - 1)
@@ -77,7 +77,7 @@ module.exports = {
       })
 
       //set current weekday
-      let currentWeekday = args[args.length - 1].charAt(0).toUpperCase() + args[args.length -1].slice(1);
+      let currentWeekday = args[args.length - 1].charAt(0).toUpperCase() + args[args.length - 1].slice(1);
 
       //if using options, convert to weekday
       let day = args.pop();
@@ -96,7 +96,7 @@ module.exports = {
         let day = week.filter((day) => day.weekday === currentWeekday);
 
         //formats temperature and feels like (comfort) to 1 decimal
-        day.forEach( t => {
+        day.forEach(t => {
           t.temperature = parseFloat(t.temperature).toFixed(1);
           t.comfort = parseFloat(t.comfort).toFixed(1);
         });
@@ -110,7 +110,7 @@ module.exports = {
 
         //check rainfall and snowfall and returns data if it exists
         const allPercipitation = (percipitation) => {
-          if (percipitation === null ) {
+          if (percipitation === null) {
             return 'no data';
           }
 
@@ -124,7 +124,7 @@ module.exports = {
         }
 
         const morning = () => {
-          if (day[0] ===  null) {
+          if (day[0] === null) {
             return 'no data';
           } else {
             let morningTemperature = `${day[0].temperature} °C`;
@@ -136,10 +136,10 @@ module.exports = {
           }
         };
 
-         const afternoon = () => {
-          if (day[1] ===  null) {
+        const afternoon = () => {
+          if (day[1] === null) {
             return 'no data';
-          } else{
+          } else {
             let afternoonTemperature = `${day[1].temperature} °C`;
             let afternoonComfort = `~${day[1].comfort} °C`;
             let afternoonPrecipitation = allPercipitation(day[1]);
@@ -149,8 +149,8 @@ module.exports = {
           }
         };
 
-         const evening = () => {
-          if (day[2] ===  null) {
+        const evening = () => {
+          if (day[2] === null) {
             return 'no data';
           } else {
             let eveningTemperature = `${day[2].temperature} °C`;
