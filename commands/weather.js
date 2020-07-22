@@ -10,12 +10,12 @@ module.exports = {
   aliases: ['w'],
   description: 'weather',
   async execute(message, args) {
-    const createNowEmbed = (temperature, comfort, description, city, country) => {
+    const createNowEmbed = (temperature, comfort, precipitation6H, description, city, country) => {
       const embed = new Discord.MessageEmbed()
         .setTitle('Weather - Now')
         .addFields(
-          { name: 'Temperature:', value: `${temperature} °C`, inline: true},
-          { name: 'Feels like:', value: `${comfort} °C`, inline: true},
+          { name: 'Temperature:', value: `${temperature} °C / feels like ${comfort} °C`, inline: true},
+          { name: 'Precipitation:', value: `${precipitation6H} cm over the next few hours.`, inline: true},
           { name: 'Description:', value: `${description}`, inline: true}
         )
         .setFooter(`${city}, ${country}`);
@@ -56,12 +56,13 @@ module.exports = {
         let weatherJson = await weatherData.json();
         let temperature = parseFloat(weatherJson.observations.location[0].observation[0].temperature).toFixed(1);
         let comfort = parseFloat(weatherJson.observations.location[0].observation[0].comfort).toFixed(1);
+        let precipitation6H = (weatherJson.observations.location[0].observation[0].precipitation6H === '*' ? '0' : parseFloat(weatherJson.observations.location[0].observation[0].precipitation6H).toFixed(2));
         let description = weatherJson.observations.location[0].observation[0].description;
         let city = weatherJson.observations.location[0].observation[0].city;
         let country = weatherJson.observations.location[0].observation[0].country;
 
         console.log('command weather now');
-        message.channel.send(createNowEmbed(temperature, comfort, description, city, country));
+        message.channel.send(createNowEmbed(temperature, comfort, precipitation6H, description, city, country));
       } catch (error) {
         console.error(error);
         message.channel.send(error.message);
