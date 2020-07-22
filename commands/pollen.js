@@ -66,7 +66,7 @@ module.exports = {
         const areaInput = args[0];
         let pollen = await fetch(`${POLLEN_API}${areaInput}`);
         let pollenJSON = await pollen.json();
-        console.log(pollenJSON);
+        console.log('command pollen');
 
         const area = `${pollenJSON.area}:`;
         const fetchTime = pollenJSON.fetchTime;
