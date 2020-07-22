@@ -95,9 +95,10 @@ module.exports = {
         let week = weatherJson.forecasts.forecastLocation.forecast;
         let day = week.filter((day) => day.weekday === currentWeekday);
 
-        //formats temp to 1 decimal
-        day.forEach( x => {
-          x.temperature = parseFloat(x.temperature).toFixed(1);
+        //formats temperature and feels like (comfort) to 1 decimal
+        day.forEach( t => {
+          t.temperature = parseFloat(t.temperature).toFixed(1);
+          t.comfort = parseFloat(t.comfort).toFixed(1);
         });
 
         //fill missing element with null
@@ -127,10 +128,11 @@ module.exports = {
             return 'no data';
           } else {
             let morningTemperature = `${day[0].temperature} °C`;
+            let morningComfort = `~${day[0].comfort} °C`;
             let morningPrecipitation = allPercipitation(day[0]);
             let morningDescription = `${day[0].description}`;
 
-            return `${morningTemperature}\n${morningPrecipitation}\n${morningDescription}`;
+            return `${morningTemperature} / ${morningComfort}\n${morningPrecipitation}\n${morningDescription}`;
           }
         };
 
@@ -139,10 +141,11 @@ module.exports = {
             return 'no data';
           } else{
             let afternoonTemperature = `${day[1].temperature} °C`;
+            let afternoonComfort = `~${day[1].comfort} °C`;
             let afternoonPrecipitation = allPercipitation(day[1]);
             let afternoonDescription = `${day[1].description}`;
 
-            return `${afternoonTemperature}\n${afternoonPrecipitation}\n${afternoonDescription}`;
+            return `${afternoonTemperature} / ${afternoonComfort}\n${afternoonPrecipitation}\n${afternoonDescription}`;
           }
         };
 
@@ -151,10 +154,11 @@ module.exports = {
             return 'no data';
           } else {
             let eveningTemperature = `${day[2].temperature} °C`;
+            let eveningComfort = `~${day[2].comfort} °C`;
             let eveningPrecipitation = allPercipitation(day[2]);
             let eveningDescription = `${day[2].description}`;
 
-            return `${eveningTemperature}\n${eveningPrecipitation}\n${eveningDescription}`;
+            return `${eveningTemperature} / ${eveningComfort}\n${eveningPrecipitation}\n${eveningDescription}`;
           }
         };
 
