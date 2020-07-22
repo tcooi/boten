@@ -107,10 +107,7 @@ module.exports = {
           } while (day.length < 4);
         }
 
-        let morningTemperature = day[0] ? `${day[0].temperature} °C` : 'no data';
-        let dayTemperature = day[1] ? `${day[1].temperature} °C` : 'no data';
-        let eveningTemperature = day[2] ? `${day[2].temperature} °C` : 'no data';
-
+        //check rainfall and snowfall and returns data if it exists
         let allPercipitation = (percipitation) => {
           if (percipitation === null ) {
             return 'no data';
@@ -123,20 +120,16 @@ module.exports = {
           } else {
             return '0 cm';
           }
-        } 
-
-        let morningPrecipitation = allPercipitation(day[0]);
-        let dayPrecipitation = allPercipitation(day[1]);
-        let eveningPrecipitation = allPercipitation(day[2]);
-
-        let morningDescription = day[0] ? `${day[0].description}` : 'no data';
-        let dayDescription = day[1] ? `${day[1].description}` : 'no data';
-        let eveningDescription = day[2] ? `${day[2].description}` : 'no data';
+        }
 
         let morning = () => {
           if (day[0] ===  null) {
             return 'no data';
           } else {
+            let morningTemperature = `${day[0].temperature} °C`;
+            let morningPrecipitation = allPercipitation(day[0]);
+            let morningDescription = `${day[0].description}`;
+
             return `${morningTemperature}\n${morningPrecipitation}\n${morningDescription}`;
           }
         };
@@ -145,7 +138,11 @@ module.exports = {
           if (day[1] ===  null) {
             return 'no data';
           } else{
-            return `${dayTemperature}\n${dayPrecipitation}\n${dayDescription}`;
+            let afternoonTemperature = `${day[1].temperature} °C`;
+            let afternoonPrecipitation = allPercipitation(day[1]);
+            let afternoonDescription = `${day[1].description}`;
+
+            return `${afternoonTemperature}\n${afternoonPrecipitation}\n${afternoonDescription}`;
           }
         };
 
@@ -153,6 +150,10 @@ module.exports = {
           if (day[2] ===  null) {
             return 'no data';
           } else {
+            let eveningTemperature = `${day[2].temperature} °C`;
+            let eveningPrecipitation = allPercipitation(day[2]);
+            let eveningDescription = `${day[2].description}`;
+
             return `${eveningTemperature}\n${eveningPrecipitation}\n${eveningDescription}`;
           }
         };
