@@ -22,25 +22,25 @@ module.exports = {
       let meter = ''
       switch (level) {
         case '0':
-          meter = '⦾⦾⦾⦾⦾⦾⦾';
+          meter = '⊙⊙⊙⊙⊙⊙⊙';
           break;
         case '1':
-          meter = '⦿⦾⦾⦾⦾⦾⦾';
+          meter = '⦿⊙⊙⊙⊙⊙⊙';
           break;
         case '2':
-          meter = '⦿⦿⦾⦾⦾⦾⦾';
+          meter = '⦿⦿⊙⊙⊙⊙⊙';
           break;
         case '3':
-          meter = '⦿⦿⦿⦾⦾⦾⦾';
+          meter = '⦿⦿⦿⊙⊙⊙⊙';
           break;
         case '4':
-          meter = '⦿⦿⦿⦿⦾⦾⦾';
+          meter = '⦿⦿⦿⦿⊙⊙⊙';
           break;
         case '5':
-          meter = '⦿⦿⦿⦿⦿⦾⦾';
+          meter = '⦿⦿⦿⦿⦿⊙⊙';
           break;
         case '6':
-          meter = '⦿⦿⦿⦿⦿⦿⦾';
+          meter = '⦿⦿⦿⦿⦿⦿⊙';
           break;
         case '7':
           meter = '⦿⦿⦿⦿⦿⦿⦿';
