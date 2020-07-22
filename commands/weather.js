@@ -109,7 +109,7 @@ module.exports = {
         }
 
         //check rainfall and snowfall and returns data if it exists
-        let allPercipitation = (percipitation) => {
+        const allPercipitation = (percipitation) => {
           if (percipitation === null ) {
             return 'no data';
           }
@@ -123,7 +123,7 @@ module.exports = {
           }
         }
 
-        let morning = () => {
+        const morning = () => {
           if (day[0] ===  null) {
             return 'no data';
           } else {
@@ -136,7 +136,7 @@ module.exports = {
           }
         };
 
-         let afternoon = () => {
+         const afternoon = () => {
           if (day[1] ===  null) {
             return 'no data';
           } else{
@@ -149,7 +149,7 @@ module.exports = {
           }
         };
 
-         let evening = () => {
+         const evening = () => {
           if (day[2] ===  null) {
             return 'no data';
           } else {
