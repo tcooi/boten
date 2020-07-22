@@ -10,6 +10,7 @@ module.exports = {
   aliases: ['w'],
   description: 'weather',
   async execute(message, args) {
+    //weather now embed
     const createNowEmbed = (temperature, comfort, precipitation6H, description, city, country) => {
       const embed = new Discord.MessageEmbed()
         .setTitle('Weather - Now')
@@ -22,13 +23,14 @@ module.exports = {
         return embed;
     }
 
-    const createDayEmbed = (currentWeekday, morningTemperature, dayTemperature, eveningTemperature, nightTemperature, morningDescription, dayDescription, eveningDescription, state, city) => {
+    //weather day embed
+    const createDayEmbed = (currentWeekday, morningTemperature, dayTemperature, eveningTemperature, morningPrecipitation, dayPrecipitation, eveningPrecipitation, morningDescription, dayDescription, eveningDescription, state, city) => {
       const embed = new Discord.MessageEmbed()
         .setTitle(`Weather - ${currentWeekday}`)
         .addFields(
-          { name: 'Morning:', value: `${morningTemperature}\n${morningDescription}`, inline: true },
-          { name: 'Afternoon:', value: `${dayTemperature}\n${dayDescription}`, inline: true },
-          { name: 'Evening:', value: `${eveningTemperature}\n${eveningDescription}`, inline: true }
+          { name: 'Morning:', value: `${morningTemperature}\n${morningPrecipitation}\n${morningDescription}`, inline: true },
+          { name: 'Afternoon:', value: `${dayTemperature}\n${dayPrecipitation}\n${dayDescription}`, inline: true },
+          { name: 'Evening:', value: `${eveningTemperature}\n${eveningPrecipitation}\n${eveningDescription}`, inline: true }
           // { name: 'Description:', value: `${description}`, inline: false }
         )
         .setFooter(`${state}, ${city}`);
@@ -75,8 +77,10 @@ module.exports = {
         cityInput += word + ' ';
       })
 
+      //set current weekday
       let currentWeekday = args[args.length - 1].charAt(0).toUpperCase() + args[args.length -1].slice(1);
 
+      //if using options, convert to weekday
       let day = args.pop();
       if (day.toLowerCase() === 'today' || day.toLowerCase() === 't') {
         currentWeekday = moment().format('dddd');
@@ -92,6 +96,7 @@ module.exports = {
         let week = weatherJson.forecasts.forecastLocation.forecast;
         let day = week.filter((day) => day.weekday === currentWeekday);
 
+        //formats temp to 1 decimal
         day.forEach( x => {
           x.temperature = parseFloat(x.temperature).toFixed(1);
         });
@@ -106,16 +111,31 @@ module.exports = {
         let morningTemperature = day[0] ? `${day[0].temperature} °C` : 'no data';
         let dayTemperature = day[1] ? `${day[1].temperature} °C` : 'no data';
         let eveningTemperature = day[2] ? `${day[2].temperature} °C` : 'no data';
-        let nightTemperature = day[3] ? `${day[3].temperature} °C` : 'no data';
-        let morningDescription = day[0] ? day[0].description : 'no data';
-        let dayDescription = day[1] ? day[1].description : 'no data';
-        let eveningDescription = day[2] ? day[2].description : 'no data';
 
-        let rainFall; 
-        let snowFall;
+        let allPercipitation = (p) => {
+          if (p === null ) {
+            return 'no data';
+          }
+
+          if (p.rainFall === "*" && p.snowFall != '*') {
+            return `${p.snowFall} cm`;
+          } else if (p.snowFall === '*' && p.rainFall != '*') {
+            return `${p.rainFall} cm`;
+          } else {
+            return '0 cm';
+          }
+        } 
+
+        let morningPrecipitation = allPercipitation(day[0]);
+        let dayPrecipitation = allPercipitation(day[1]);
+        let eveningPrecipitation = allPercipitation(day[2]);
+
+        let morningDescription = day[0] ? `${day[0].description}` : 'no data';
+        let dayDescription = day[1] ? `${day[1].description}` : 'no data';
+        let eveningDescription = day[2] ? `${day[2].description}` : 'no data';
 
         console.log('command weather dayview');
-        message.channel.send(createDayEmbed(currentWeekday, morningTemperature, dayTemperature, eveningTemperature, nightTemperature, morningDescription, dayDescription, eveningDescription, city, country));
+        message.channel.send(createDayEmbed(currentWeekday, morningTemperature, dayTemperature, eveningTemperature, morningPrecipitation, dayPrecipitation, eveningPrecipitation, morningDescription, dayDescription, eveningDescription, city, country));
       } catch (error) {
         console.error(error);
         message.channel.send(error.message);
