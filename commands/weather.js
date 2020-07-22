@@ -22,14 +22,14 @@ module.exports = {
         return embed;
     }
 
-    const createDayEmbed = (currentWeekday, morningTemperature, dayTemperature, eveningTemperature, nightTemperature, description, state, city) => {
+    const createDayEmbed = (currentWeekday, morningTemperature, dayTemperature, eveningTemperature, nightTemperature, morningDescription, dayDescription, eveningDescription, state, city) => {
       const embed = new Discord.MessageEmbed()
         .setTitle(`Weather - ${currentWeekday}`)
         .addFields(
-          { name: 'Morning:', value: `${morningTemperature}`, inline: true },
-          { name: 'Afternoon:', value: `${dayTemperature}`, inline: true },
-          { name: 'Evening:', value: `${eveningTemperature}`, inline: true },
-          { name: 'Description:', value: `${description}`, inline: false }
+          { name: 'Morning:', value: `${morningTemperature}\n${morningDescription}`, inline: true },
+          { name: 'Afternoon:', value: `${dayTemperature}\n${dayDescription}`, inline: true },
+          { name: 'Evening:', value: `${eveningTemperature}\n${eveningDescription}`, inline: true }
+          // { name: 'Description:', value: `${description}`, inline: false }
         )
         .setFooter(`${state}, ${city}`);
       return embed;
@@ -96,7 +96,7 @@ module.exports = {
           x.temperature = parseFloat(x.temperature).toFixed(1);
         });
 
-        //fill empty space with null
+        //fill missing element with null
         if (day.length != 4 && currentWeekday === moment().format('dddd')) {
           do {
             day.unshift(null)
@@ -107,10 +107,15 @@ module.exports = {
         let dayTemperature = day[1] ? `${day[1].temperature} °C` : 'no data';
         let eveningTemperature = day[2] ? `${day[2].temperature} °C` : 'no data';
         let nightTemperature = day[3] ? `${day[3].temperature} °C` : 'no data';
-        let description = day[1] ? day[1].description : 'no data';
+        let morningDescription = day[0] ? day[0].description : 'no data';
+        let dayDescription = day[1] ? day[1].description : 'no data';
+        let eveningDescription = day[2] ? day[2].description : 'no data';
+
+        let rainFall; 
+        let snowFall;
 
         console.log('command weather dayview');
-        message.channel.send(createDayEmbed(currentWeekday, morningTemperature, dayTemperature, eveningTemperature, nightTemperature, description, city, country));
+        message.channel.send(createDayEmbed(currentWeekday, morningTemperature, dayTemperature, eveningTemperature, nightTemperature, morningDescription, dayDescription, eveningDescription, city, country));
       } catch (error) {
         console.error(error);
         message.channel.send(error.message);
