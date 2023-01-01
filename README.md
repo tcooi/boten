@@ -19,6 +19,7 @@ npm install
 Setup .env file
 ```
 DISCORD_TOKEN=YOUR_DISCORD_TOKEN_HERE
+APPLICATION_ID=YOUR_DISCORD_APPLICATION_ID_HERE
 HERE_API=YOUR_API_KEY_HERE
 SL_API=YOUR_SL_API_HERE
 ```
@@ -30,5 +31,5 @@ npm start
 
 ## Commands
 
--weather
+-weather  
 -SL
