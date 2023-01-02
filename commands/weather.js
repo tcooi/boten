@@ -31,7 +31,20 @@ module.exports = {
           { name: 'Precipitation:', value: `${precipitation6H} cm over the next few hours.`, inline: true },
           { name: 'Description:', value: `${description}`, inline: true }
         )
-        .setFooter({ text: `${city}, ${country}`});
+        .setFooter({ text: `${city}, ${country}` });
+      return embed;
+    }
+
+    //weather day embed
+    const createDayEmbed = (currentWeekday, morning, afternoon, evening, state, city) => {
+      const embed = new Discord.MessageEmbed()
+        .setTitle(`Weather - ${currentWeekday}`)
+        .addFields(
+          { name: 'Morning:', value: `${morning}`, inline: true },
+          { name: 'Afternoon:', value: `${afternoon}`, inline: true },
+          { name: 'Evening:', value: `${evening}`, inline: true }
+        )
+        .setFooter({ text: `${state}, ${city}` });
       return embed;
     }
 
@@ -65,25 +78,6 @@ module.exports = {
   }
 
   // async execute(message, args) {
-
-  //   //weather day embed
-  //   const createDayEmbed = (currentWeekday, morning, afternoon, evening, state, city) => {
-  //     const embed = new Discord.MessageEmbed()
-  //       .setTitle(`Weather - ${currentWeekday}`)
-  //       .addFields(
-  //         { name: 'Morning:', value: `${morning}`, inline: true },
-  //         { name: 'Afternoon:', value: `${afternoon}`, inline: true },
-  //         { name: 'Evening:', value: `${evening}`, inline: true }
-  //       )
-  //       .setFooter(`${state}, ${city}`);
-  //     return embed;
-  //   }
-
-  //   //check for input
-  //   if (args.length === 0) {
-  //     message.reply('please enter city');
-  //     return;
-  //   }
 
   //   let weekdays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
   //   let options = ['today', 't', 'tomorrow', 'tm']
