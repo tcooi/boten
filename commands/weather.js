@@ -1,12 +1,12 @@
 require('dotenv').config();
 const fetch = require('node-fetch');
 const moment = require('moment');
-const Discord = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 
 const HERE_KEY = process.env.HERE_KEY;
+const CITY = process.env.CITY;
 
 const { SlashCommandBuilder } = require('discord.js');
-const { execute } = require('./ping');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -21,22 +21,50 @@ module.exports = {
         .setDescription('Choose which city to show weather from')
         .setRequired(false)),
   async execute(interaction) {
-    await interaction.reply('weather information here')
+
+    //weather now embed
+    const createNowEmbed = (temperature, comfort, precipitation6H, description, city, country) => {
+      const embed = new EmbedBuilder()
+        .setTitle('Weather - Now')
+        .addFields(
+          { name: 'Temperature:', value: `${temperature} °C / feels like ${comfort} °C`, inline: true },
+          { name: 'Precipitation:', value: `${precipitation6H} cm over the next few hours.`, inline: true },
+          { name: 'Description:', value: `${description}`, inline: true }
+        )
+        .setFooter({ text: `${city}, ${country}`});
+      return embed;
+    }
+
+    const optionDay = interaction.options.getString('day');
+    const optionCity = interaction.options.getString('city') ?? CITY;
+
+    //show current weather
+    if (optionDay === null) {
+      try {
+        const weatherData = await fetch(`https://weather.ls.hereapi.com/weather/1.0/report.json?apiKey=${HERE_KEY}&product=observation&name=${optionCity}`);
+        const weatherJson = await weatherData.json();
+        const temperature = parseFloat(weatherJson.observations.location[0].observation[0].temperature).toFixed(1);
+        const comfort = parseFloat(weatherJson.observations.location[0].observation[0].comfort).toFixed(1);
+        const precipitation6H = (weatherJson.observations.location[0].observation[0].precipitation6H === '*' ? '0' : parseFloat(weatherJson.observations.location[0].observation[0].precipitation6H).toFixed(2));
+        const description = weatherJson.observations.location[0].observation[0].description;
+        const city = weatherJson.observations.location[0].observation[0].city;
+        const country = weatherJson.observations.location[0].observation[0].country;
+
+        console.log('command: weather now');
+        await interaction.reply({ embeds: [createNowEmbed(temperature, comfort, precipitation6H, description, city, country)]});
+      } catch (error) {
+        console.error(error)
+        await interaction.reply(error);
+      }
+    //show weather for a specific day
+    } else if (optionDay) { 
+
+    } else {
+      console.log('error')
+    }
   }
 
   // async execute(message, args) {
-  //   //weather now embed
-  //   const createNowEmbed = (temperature, comfort, precipitation6H, description, city, country) => {
-  //     const embed = new Discord.MessageEmbed()
-  //       .setTitle('Weather - Now')
-  //       .addFields(
-  //         { name: 'Temperature:', value: `${temperature} °C / feels like ${comfort} °C`, inline: true },
-  //         { name: 'Precipitation:', value: `${precipitation6H} cm over the next few hours.`, inline: true },
-  //         { name: 'Description:', value: `${description}`, inline: true }
-  //       )
-  //       .setFooter(`${city}, ${country}`);
-  //     return embed;
-  //   }
 
   //   //weather day embed
   //   const createDayEmbed = (currentWeekday, morning, afternoon, evening, state, city) => {
