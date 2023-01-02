@@ -15,6 +15,11 @@ for (const file of commandFiles) {
 // Construct and prepare an instance of the REST module
 const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN);
 
+// delete all commands
+rest.put(Routes.applicationCommands(process.env.APPLICATION_ID), { body: [] })
+	.then(() => console.log('Successfully deleted all application commands.'))
+	.catch(console.error);
+
 // and deploy your commands!
 (async () => {
 	try {
