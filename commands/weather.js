@@ -23,12 +23,13 @@ module.exports = {
   async execute(interaction) {
 
     //weather now embed
-    const createNowEmbed = (temperature, comfort, precipitation, description, city, country) => {
+    const createNowEmbed = (temperature, comfort, precipitation, precipitationDecription, description, city, country) => {
       const embed = new EmbedBuilder()
         .setTitle('Weather - Now')
         .addFields(
           { name: 'Temperature:', value: `${temperature} °C / feels like ${comfort} °C`, inline: true },
-          { name: 'Precipitation:', value: `${precipitation} cm over the next few hours.`, inline: true },
+          { name: 'Precipitation:', value: `${precipitation} ${precipitationDecription}`, inline: true },
+          // cm over the next few hours.
           { name: 'Description:', value: `${description}`, inline: true }
         )
         .setFooter({ text: `${city}, ${country}` });
@@ -59,15 +60,17 @@ module.exports = {
         const temperature = parseFloat(weatherJson.observations.location[0].observation[0].temperature).toFixed(1);
         const comfort = parseFloat(weatherJson.observations.location[0].observation[0].comfort).toFixed(1);
         const precipitation3H = (weatherJson.observations.location[0].observation[0].precipitation3H === '*' ? '0' : parseFloat(weatherJson.observations.location[0].observation[0].precipitation3H).toFixed(2));
-        const snowfall = weatherJson.observations.location[0].observation[0].snowFall;
+        const rainFall = weatherJson.observations.location[0].observation[0].rainFall === '*' ? '0' : weatherJson.observations.location[0].observation[0].rainFall;
+        const snowFall = weatherJson.observations.location[0].observation[0].snowFall === '*' ? '0' : weatherJson.observations.location[0].observation[0].snowFall;
         const description = weatherJson.observations.location[0].observation[0].description;
         const city = weatherJson.observations.location[0].observation[0].city;
         const country = weatherJson.observations.location[0].observation[0].country;
 
-        let precipitation = precipitation3H > snowfall ? precipitation3H : snowfall;
+        const precipitation = rainFall >= snowFall ? rainFall : snowFall;
+        const precipitationDecription = rainFall >= snowFall ? 'cm rain.' : 'cm snow.';
 
         console.log('command: weather now');
-        await interaction.reply({ embeds: [createNowEmbed(temperature, comfort, precipitation, description, city, country)]});
+        await interaction.reply({ embeds: [createNowEmbed(temperature, comfort, precipitation, precipitationDecription, description, city, country)]});
       } catch (error) {
         console.error(error)
         await interaction.reply(error);
