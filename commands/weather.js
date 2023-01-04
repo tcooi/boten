@@ -23,12 +23,12 @@ module.exports = {
   async execute(interaction) {
 
     //weather now embed
-    const createNowEmbed = (temperature, comfort, precipitation6H, description, city, country) => {
+    const createNowEmbed = (temperature, comfort, precipitation, description, city, country) => {
       const embed = new EmbedBuilder()
         .setTitle('Weather - Now')
         .addFields(
           { name: 'Temperature:', value: `${temperature} °C / feels like ${comfort} °C`, inline: true },
-          { name: 'Precipitation:', value: `${precipitation6H} cm over the next few hours.`, inline: true },
+          { name: 'Precipitation:', value: `${precipitation} cm over the next few hours.`, inline: true },
           { name: 'Description:', value: `${description}`, inline: true }
         )
         .setFooter({ text: `${city}, ${country}` });
@@ -48,7 +48,7 @@ module.exports = {
       return embed;
     }
 
-    const optionDay = interaction.options.getString('day');
+    let optionDay = interaction.options.getString('day');
     const optionCity = interaction.options.getString('city') ?? CITY;
 
     //show current weather
@@ -58,19 +58,113 @@ module.exports = {
         const weatherJson = await weatherData.json();
         const temperature = parseFloat(weatherJson.observations.location[0].observation[0].temperature).toFixed(1);
         const comfort = parseFloat(weatherJson.observations.location[0].observation[0].comfort).toFixed(1);
-        const precipitation6H = (weatherJson.observations.location[0].observation[0].precipitation6H === '*' ? '0' : parseFloat(weatherJson.observations.location[0].observation[0].precipitation6H).toFixed(2));
+        const precipitation3H = (weatherJson.observations.location[0].observation[0].precipitation3H === '*' ? '0' : parseFloat(weatherJson.observations.location[0].observation[0].precipitation3H).toFixed(2));
+        const snowfall = weatherJson.observations.location[0].observation[0].snowFall;
         const description = weatherJson.observations.location[0].observation[0].description;
         const city = weatherJson.observations.location[0].observation[0].city;
         const country = weatherJson.observations.location[0].observation[0].country;
 
+        let precipitation = precipitation3H > snowfall ? precipitation3H : snowfall;
+
         console.log('command: weather now');
-        await interaction.reply({ embeds: [createNowEmbed(temperature, comfort, precipitation6H, description, city, country)]});
+        await interaction.reply({ embeds: [createNowEmbed(temperature, comfort, precipitation, description, city, country)]});
       } catch (error) {
         console.error(error)
         await interaction.reply(error);
       }
     //show weather for a specific day
-    } else if (optionDay) { 
+    } else if (optionDay) {
+      optionDay.toLowerCase();
+      
+      if (optionDay === 'today' || optionDay === 't') {
+        optionDay = moment().format('dddd');
+      }
+
+      if (optionDay === 'tomorrow' || optionDay === 'tm') {
+        optionDay = moment().add(1, 'days').format('dddd');
+      }
+
+      try {
+        const weatherData = await fetch(`https://weather.ls.hereapi.com/weather/1.0/report.json?apiKey=${HERE_KEY}&product=forecast_7days&name=${optionCity}`);
+        const weatherJson = await weatherData.json();
+        const city = weatherJson.forecasts.forecastLocation.city;
+        const country = weatherJson.forecasts.forecastLocation.country;
+        const week = weatherJson.forecasts.forecastLocation.forecast;
+        const day = week.filter((day) => day.weekday === currentWeekday);
+
+        //formats temperature and feels like (comfort) to 1 decimal
+        day.forEach(t => {
+          t.temperature = parseFloat(t.temperature).toFixed(1);
+          t.comfort = parseFloat(t.comfort).toFixed(1);
+        });
+
+        //fill missing element with null
+        if (day.length != 4 && optionDay === moment().format('dddd')) {
+          do {
+            day.unshift(null)
+          } while (day.length < 4);
+        }
+
+        //check rainfall and snowfall and returns data if it exists
+        const allPercipitation = (percipitation) => {
+          if (percipitation === null) {
+            return 'no data';
+          }
+
+          if (percipitation.rainFall === "*" && percipitation.snowFall != '*') {
+            return `${percipitation.snowFall} cm`;
+          } else if (percipitation.snowFall === '*' && percipitation.rainFall != '*') {
+            return `${percipitation.rainFall} cm`;
+          } else {
+            return '0 cm';
+          }
+        }
+
+        const morning = () => {
+          if (day[0] === null) {
+            return 'no data';
+          } else {
+            let morningTemperature = `${day[0].temperature} °C`;
+            let morningComfort = `~${day[0].comfort} °C`;
+            let morningPrecipitation = allPercipitation(day[0]);
+            let morningDescription = `${day[0].description}`;
+
+            return `${morningTemperature} / ${morningComfort}\n${morningPrecipitation}\n${morningDescription}`;
+          }
+        };
+
+        const afternoon = () => {
+          if (day[1] === null) {
+            return 'no data';
+          } else {
+            let afternoonTemperature = `${day[1].temperature} °C`;
+            let afternoonComfort = `~${day[1].comfort} °C`;
+            let afternoonPrecipitation = allPercipitation(day[1]);
+            let afternoonDescription = `${day[1].description}`;
+
+            return `${afternoonTemperature} / ${afternoonComfort}\n${afternoonPrecipitation}\n${afternoonDescription}`;
+          }
+        };
+
+        const evening = () => {
+          if (day[2] === null) {
+            return 'no data';
+          } else {
+            let eveningTemperature = `${day[2].temperature} °C`;
+            let eveningComfort = `~${day[2].comfort} °C`;
+            let eveningPrecipitation = allPercipitation(day[2]);
+            let eveningDescription = `${day[2].description}`;
+
+            return `${eveningTemperature} / ${eveningComfort}\n${eveningPrecipitation}\n${eveningDescription}`;
+          }
+        };
+
+        console.log('command: weather dayview');
+        await interaction.reply({ embeds: [createDayEmbed(optionDay, morning(), afternoon(), evening(), city, country)]});
+      } catch (error) {
+        console.error(error);
+        await interaction.reply(error);
+      }
 
     } else {
       console.log('error')
