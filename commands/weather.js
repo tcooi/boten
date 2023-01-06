@@ -38,7 +38,7 @@ module.exports = {
 
     //weather day embed
     const createDayEmbed = (currentWeekday, morning, afternoon, evening, state, city) => {
-      const embed = new Discord.MessageEmbed()
+      const embed = new EmbedBuilder()
         .setTitle(`Weather - ${currentWeekday}`)
         .addFields(
           { name: 'Morning:', value: `${morning}`, inline: true },
@@ -59,7 +59,7 @@ module.exports = {
         const weatherJson = await weatherData.json();
         const temperature = parseFloat(weatherJson.observations.location[0].observation[0].temperature).toFixed(1);
         const comfort = parseFloat(weatherJson.observations.location[0].observation[0].comfort).toFixed(1);
-        const precipitation3H = (weatherJson.observations.location[0].observation[0].precipitation3H === '*' ? '0' : parseFloat(weatherJson.observations.location[0].observation[0].precipitation3H).toFixed(2));
+        //const precipitation3H = (weatherJson.observations.location[0].observation[0].precipitation3H === '*' ? '0' : parseFloat(weatherJson.observations.location[0].observation[0].precipitation3H).toFixed(2));
         const rainFall = weatherJson.observations.location[0].observation[0].rainFall === '*' ? '0' : weatherJson.observations.location[0].observation[0].rainFall;
         const snowFall = weatherJson.observations.location[0].observation[0].snowFall === '*' ? '0' : weatherJson.observations.location[0].observation[0].snowFall;
         const description = weatherJson.observations.location[0].observation[0].description;
@@ -81,19 +81,19 @@ module.exports = {
       
       if (optionDay === 'today' || optionDay === 't') {
         optionDay = moment().format('dddd');
-      }
-
-      if (optionDay === 'tomorrow' || optionDay === 'tm') {
+      } else if (optionDay === 'tomorrow' || optionDay === 'tm') {
         optionDay = moment().add(1, 'days').format('dddd');
+      } else {
+        optionDay = optionDay.charAt(0).toUpperCase() + optionDay.slice(1).toLowerCase() 
       }
 
       try {
-        const weatherData = await fetch(`https://weather.ls.hereapi.com/weather/1.0/report.json?apiKey=${HERE_KEY}&product=forecast_7days&name=${optionCity}`);
-        const weatherJson = await weatherData.json();
-        const city = weatherJson.forecasts.forecastLocation.city;
-        const country = weatherJson.forecasts.forecastLocation.country;
-        const week = weatherJson.forecasts.forecastLocation.forecast;
-        const day = week.filter((day) => day.weekday === currentWeekday);
+        let weatherData = await fetch(`https://weather.ls.hereapi.com/weather/1.0/report.json?apiKey=${HERE_KEY}&product=forecast_7days&name=${optionCity}`);
+        let weatherJson = await weatherData.json();
+        let city = weatherJson.forecasts.forecastLocation.city;
+        let country = weatherJson.forecasts.forecastLocation.country;
+        let week = weatherJson.forecasts.forecastLocation.forecast;
+        let day = week.filter((day) => day.weekday === optionDay);
 
         //formats temperature and feels like (comfort) to 1 decimal
         day.forEach(t => {
@@ -115,11 +115,11 @@ module.exports = {
           }
 
           if (percipitation.rainFall === "*" && percipitation.snowFall != '*') {
-            return `${percipitation.snowFall} cm`;
+            return `${percipitation.snowFall} cm snow`;
           } else if (percipitation.snowFall === '*' && percipitation.rainFall != '*') {
-            return `${percipitation.rainFall} cm`;
+            return `${percipitation.rainFall} cm rain`;
           } else {
-            return '0 cm';
+            return '0 cm rain';
           }
         }
 
@@ -162,13 +162,12 @@ module.exports = {
           }
         };
 
-        console.log('command: weather dayview');
+        console.log('command weather dayview');
         await interaction.reply({ embeds: [createDayEmbed(optionDay, morning(), afternoon(), evening(), city, country)]});
       } catch (error) {
         console.error(error);
-        await interaction.reply(error);
+        message.channel.send(error.message);
       }
-
     } else {
       console.log('error')
     }
