@@ -1,5 +1,4 @@
 require('dotenv').config();
-const { prefix } = require('./config.json');
 const fs = require('fs');
 const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
 const client = new Client({ intents: [GatewayIntentBits.Guilds]});
@@ -53,13 +52,6 @@ client.on(Events.InteractionCreate, async interaction => {
     console.error(error);
     await interaction.reply({ content: 'There was an error trying to execute this command', ephemeral: true });
   }
-
-  // let args = message.content.slice(prefix.length).split(' ');
-  // let commandName = args.shift().toLowerCase();
-
-  // let command = client.commands.get(commandName) || client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
-  // if (!command) return;
-
 });
 
 client.login(token);
