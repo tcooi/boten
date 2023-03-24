@@ -25,6 +25,11 @@ CITY=YOUR_CITY
 SL_API=YOUR_SL_API_HERE
 ```
 
+Deploy commands
+```
+node deploy-commands.js
+```
+
 Start bot
 ```
 npm start
