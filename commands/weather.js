@@ -11,14 +11,14 @@ const { SlashCommandBuilder } = require('discord.js');
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('weather')
-    .setDescription('Show current weather')
+    .setDescription('Get weather information')
     .addStringOption(option => 
       option.setName('day')
-        .setDescription('Show weather for specific day')
+        .setDescription('Choose which day to get weather information from')
         .setRequired(false))
     .addStringOption(option => 
       option.setName('city')
-        .setDescription('Choose which city to show weather from')
+        .setDescription('Choose which city to get weather information from')
         .setRequired(false)),
   async execute(interaction) {
 
@@ -162,11 +162,11 @@ module.exports = {
           }
         };
 
-        console.log('command weather dayview');
+        console.log('command: weather dayview');
         await interaction.reply({ embeds: [createDayEmbed(optionDay, morning(), afternoon(), evening(), city, country)]});
       } catch (error) {
         console.error(error);
-        message.channel.send(error.message);
+        await interaction.reply(error.message);
       }
     } else {
       console.log('error')
